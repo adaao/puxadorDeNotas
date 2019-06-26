@@ -7,3 +7,15 @@ if now.month < 10:
 else:
     mesEAno = (str(now.year) + str(now.month))
 print(mesEAno)
+
+if os.path.exists(caminhoDaPastaSatXml):
+    caminhos = [os.path.join(caminhoDaPastaSatXml, nome) for nome in os.listdir(caminhoDaPastaSatXml)]
+    arquivos = [arq for arq in caminhos if os.path.isfile(arq)]
+    xmlsSat = [arq for arq in arquivos if arq.lower().endswith('.xml')]
+    print(xmlsSat)
+else:
+    os.mkdir('C:/Users/Adaão/Desktop/testeDeCriacao')
+    if os.path.exists('C:/Users/Adaão/Desktop/testeDeCriacao'):
+        print('O diretorio foi criado')
+    else:
+        print('O diretorio não pode ser criado')
