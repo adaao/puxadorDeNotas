@@ -1,52 +1,81 @@
 import os.path
 from datetime import datetime
 from xml.dom import minidom
+
 print('Salvando arquivos fiscais...')
 diretorioSat = 'C:/Program Files (x86)/Nox Automação/Fenix/SAT/XML'
-pastaNfe = 'C:/Program Files (x86)/Nox Automação/Fenix/NFe/XML'
-pastaDestinoSat = 'C:/Users/adaao/Desktop'
+diretorioNfe = 'C:/Program Files (x86)/Nox Automação/Fenix/NFe/XML'
 tag = 'bar'
 
+
 now = datetime.now()
+
 
 if now.month < 10:
     nowInStr = str(now.year) + '0' + str(now.month) + str(now.day)
 else:
     nowInStr = str(now.year) + str(now.month) + str(now.day)
 
-def calculaMesPassado():
-    if (now.month - 1) < 10:
-        mesPassado = (str(now.year) + '0' + str(now.month - 1))
+
+def formataMes(mes):
+    if mes < 10:
+        mesFormatado = '0' + str(mes - 1)
     else:
-        mesPassado = (str(now.year) + str(now.month - 1))
+        mesFormatado = str(mes)
+    return mesFormatado
+
+
+def calculaMesPassado():
+    if (now.month == 1):
+        mesPassado = 12
+    else:
+        mesPassado = now.month - 1
     return mesPassado
-    
+
+
+def calculaAno():
+    if (now.month == 1):
+        ano = now.year - 1
+    else:
+        ano = now.year
+    return ano
+
 
 def verificaArquivos(diretorio):
-    
     if os.path.exists(diretorio):
         arquivos = [os.path.join(diretorio, arquivo) for arquivo in os.listdir(diretorio)]
         arquivosXml = [arq for arq in arquivos if os.path.isfile(arq) and arq.lower().endswith('.xml')]
-        separaArquivosPorDataDeEmissao(arquivosXml, calculaMesPassado())
+        separaArquivosPorDataDeEmissao(arquivosXml, formataMes(calculaMesPassado()))
     else:
         print('Os diretorios que deveriam conter os arquivos não foram encontrados...')
         input()
 
-def separaArquivosPorDataDeEmissao(arquivos, mesPassado):
+
+def separaArquivosPorDataDeEmissao(arquivos, mesPassadoFormatado):
     for arquivo in arquivos:
         xmldoc = minidom.parse(arquivo)
         dataDeEmissao = xmldoc.getElementsByTagName('dEmi')[0]
+
+        '''
         print(arquivo)
         print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
         print('{} == {} = {}'.format(str(dataDeEmissao.firstChild.data), nowInStr, str(dataDeEmissao.firstChild.data) == nowInStr))
-        print(str(dataDeEmissao.firstChild.data)[4:6].__eq__(mesPassado))
+        '''
 
-    print(retornaNomeDoMes(now.month))
+        print(str(dataDeEmissao.firstChild.data)[4:6].__eq__(mesPassadoFormatado))
+        nomeDoMes = retornaNomeDoMes(calculaMesPassado())
+        print('mes passado: ' + nomeDoMes)
 
-def criaDiretorioDeDestino(tipoDeArquivo, mes, ano):
 
-    if not (os.path.exists('C:/arquivos fiscais/' + ano + '/' + mes + '/' + tipoDeArquivo)):
-        os.makedirs('C:/arquivos fiscais/' + ano + '/' + mes + '/' + tipoDeArquivo)
+def criaDiretoriosDeDestino(ano, mes):
+    diretorioSat = 'C:/arquivos fiscais/' + ano + '/' + mes + '/SAT'
+    diretorioNfe = 'C:/arquivos fiscais/' + ano + '/' + mes + '/NFE'
+    if not (os.path.exists(diretorioSat)):
+        os.makedirs(diretorioSat)
+
+    if not (os.path.exists(diretorioNfe)):
+        os.makedirs(diretorioNfe)
+
 
 def retornaNomeDoMes(mes):
     switcher = {
@@ -63,10 +92,9 @@ def retornaNomeDoMes(mes):
         11: "11 - NOVEMBRO",
         12: "12 - DEZEMBRO"
     }
-    print(switcher.get(mes, "Mês inválido"))
+    return switcher.get(mes, 'mes invalido')
 
-criaDiretorioDeDestino('NFE', '00 - TESTE', '2019')
-'''
+criaDiretoriosDeDestino(str(calculaAno()), retornaNomeDoMes(calculaMesPassado()))
+criaDiretoriosDeDestino(str(calculaAno()), retornaNomeDoMes(calculaMesPassado()))
 verificaArquivos(diretorioSat)
-'''
-'''input('Arquivos salvos, digite enter para sair.')'''
+
