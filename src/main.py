@@ -5,7 +5,8 @@ from xml.dom import minidom
 print('Salvando arquivos fiscais...')
 diretorioSat = 'C:/Program Files (x86)/Nox Automação/Fenix/SAT/XML'
 diretorioNfe = 'C:/Program Files (x86)/Nox Automação/Fenix/NFe/XML'
-tag = 'bar'
+tagSat = 'dEmi'
+tagNfe = 'dhEmi'
 
 
 now = datetime.now()
@@ -60,11 +61,11 @@ def separaArquivosPorDataDeEmissao(arquivos, mesPassadoFormatado):
         print(arquivo)
         print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
         print('{} == {} = {}'.format(str(dataDeEmissao.firstChild.data), nowInStr, str(dataDeEmissao.firstChild.data) == nowInStr))
-        '''
-
-        print(str(dataDeEmissao.firstChild.data)[4:6].__eq__(mesPassadoFormatado))
         nomeDoMes = retornaNomeDoMes(calculaMesPassado())
         print('mes passado: ' + nomeDoMes)
+        '''
+        print(str(dataDeEmissao.firstChild.data)[4:6].__eq__(mesPassadoFormatado))
+
 
 
 def criaDiretoriosDeDestino(ano, mes):
