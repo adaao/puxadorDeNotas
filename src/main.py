@@ -15,7 +15,7 @@ else:
     nowInStr = str(now.year) + str(now.month) + str(now.day)
 
 def calculaMesPassado():
-    if now.month < 10:
+    if (now.month - 1) < 10:
         mesPassado = (str(now.year) + '0' + str(now.month - 1))
     else:
         mesPassado = (str(now.year) + str(now.month - 1))
@@ -33,9 +33,6 @@ def verificaArquivos(diretorio):
         input()
 
 def separaArquivosPorDataDeEmissao(arquivos, mesPassado):
-    if not (os.path.exists('C:/arquivos fiscais/' + str(now.year))):
-        os.makedirs('C:/arquivos fiscais/' + str(now.year))
-
     for arquivo in arquivos:
         xmldoc = minidom.parse(arquivo)
         dataDeEmissao = xmldoc.getElementsByTagName('dEmi')[0]
@@ -45,6 +42,11 @@ def separaArquivosPorDataDeEmissao(arquivos, mesPassado):
         print(str(dataDeEmissao.firstChild.data)[4:6].__eq__(mesPassado))
 
     print(retornaNomeDoMes(now.month))
+
+def criaDiretorioDeDestino(tipoDeArquivo, mes, ano):
+
+    if not (os.path.exists('C:/arquivos fiscais/' + ano + '/' + mes + '/' + tipoDeArquivo)):
+        os.makedirs('C:/arquivos fiscais/' + ano + '/' + mes + '/' + tipoDeArquivo)
 
 def retornaNomeDoMes(mes):
     switcher = {
@@ -61,7 +63,10 @@ def retornaNomeDoMes(mes):
         11: "11 - NOVEMBRO",
         12: "12 - DEZEMBRO"
     }
-    print(switcher.get(mes, "Invalid month"))
+    print(switcher.get(mes, "Mês inválido"))
 
+criaDiretorioDeDestino('NFE', '00 - TESTE', '2019')
+'''
 verificaArquivos(diretorioSat)
+'''
 '''input('Arquivos salvos, digite enter para sair.')'''
