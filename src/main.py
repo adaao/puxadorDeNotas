@@ -33,6 +33,9 @@ def verificaArquivos(diretorio):
         input()
 
 def separaArquivosPorDataDeEmissao(arquivos, mesPassado):
+    if not (os.path.exists('C:/arquivos fiscais/' + str(now.year))):
+        os.makedirs('C:/arquivos fiscais/' + str(now.year))
+
     for arquivo in arquivos:
         xmldoc = minidom.parse(arquivo)
         dataDeEmissao = xmldoc.getElementsByTagName('dEmi')[0]
@@ -40,6 +43,25 @@ def separaArquivosPorDataDeEmissao(arquivos, mesPassado):
         print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
         print('{} == {} = {}'.format(str(dataDeEmissao.firstChild.data), nowInStr, str(dataDeEmissao.firstChild.data) == nowInStr))
         print(str(dataDeEmissao.firstChild.data)[4:6].__eq__(mesPassado))
+
+    print(retornaNomeDoMes(now.month))
+
+def retornaNomeDoMes(mes):
+    switcher = {
+        1: "01 - JANEIRO",
+        2: "02 - FEVEREIRO",
+        3: "03 - MARÇO",
+        4: "04 - ABRIL",
+        5: "05 - MAIO",
+        6: "06 - JUNHO",
+        7: "07 - JULHO",
+        8: "08 - AGOSTO",
+        9: "09 - SETEMBRO",
+        10: "10 - OUTUBRO",
+        11: "11 - NOVEMBRO",
+        12: "12 - DEZEMBRO"
+    }
+    print(switcher.get(mes, "Invalid month"))
 
 verificaArquivos(diretorioSat)
 '''input('Arquivos salvos, digite enter para sair.')'''
