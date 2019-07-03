@@ -78,14 +78,24 @@ def separaArquivosNfePorDataDeEmissao(ano, mes):
     print('==================== arquivos nfe ====================')
     arquivos = filtraArquivosXml(diretorioNfe)
     for arquivo in arquivos:
-        if (arquivo[::-1][0:7] == 'lmx.efn') or :
+        if (arquivo[::-1][0:7] == 'lmx.efn') or (arquivo[::-1][0:7] == 'lmx.uni'):
             xmldoc = minidom.parse(arquivo)
-            dataDeEmissao = xmldoc.getElementsByTagName(tagNfe)[0]
+            dataDeEmissao = xmldoc.getElementsByTagName('dhEmi')[0]
             if (str(dataDeEmissao.firstChild.data)[5:7].__eq__(mesFormatado)):
-                print('troll')
+                print(arquivo)
+                print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
+                shutil.copy(arquivo, diretorioDestinoNfe)
             else:
-                print(str(dataDeEmissao.firstChild.data))
-
+                print('troll')
+        if (arquivo[::-1][0:7] == 'lmx.ecc') or (arquivo[::-1][0:7] == 'lmx.eve'):
+            xmldoc = minidom.parse(arquivo)
+            dataDeEmissao = xmldoc.getElementsByTagName('dhEvento')[0]
+            if (str(dataDeEmissao.firstChild.data)[5:7].__eq__(mesFormatado)):
+                print(arquivo)
+                print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
+                shutil.copy(arquivo, diretorioDestinoNfe)
+            else:
+                print('troll')
 
 def criaDiretorioDeDestino(caminho):
     if not (os.path.exists(caminho)):
