@@ -1,4 +1,5 @@
 import os.path
+import shutil
 from datetime import datetime
 from xml.dom import minidom
 
@@ -52,56 +53,43 @@ def filtraArquivosXml(diretorio):
         input()
 
 
-def separaArquivosSatPorDataDeEmissao(mesPassadoFormatado):
+def separaArquivosSatPorDataDeEmissao(ano, mes):
+    nomeDoMes = retornaNomeDoMes(mes)
+    print('==================== arquivos sat ====================')
+    diretorioDestinoSat = 'C:/arquivos fiscais/' + str(ano) + '/' + nomeDoMes + '/SAT'
+    criaDiretorioDeDestino(diretorioDestinoSat)
+    mesFormatado = formataMes(mes)
     arquivos = filtraArquivosXml(diretorioSat)
     for arquivo in arquivos:
         if (arquivo[51:53] == 'AD'):
             xmldoc = minidom.parse(arquivo)
             dataDeEmissao = xmldoc.getElementsByTagName(tagSat)[0]
-
-            '''
-            print(arquivo)
-            
-            print('{} == {} = {}'.format(str(dataDeEmissao.firstChild.data), nowInStr, str(dataDeEmissao.firstChild.data) == nowInStr))
-            nomeDoMes = retornaNomeDoMes(calculaMesPassado())
-            print('mes passado: ' + nomeDoMes)
-            '''
-            if (str(dataDeEmissao.firstChild.data)[4:6].__eq__(mesPassadoFormatado)):
+            if (str(dataDeEmissao.firstChild.data)[4:6].__eq__(mesFormatado)):
+                print(arquivo)
                 print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
-                print('narf')
-            else:
-                print('troz')
+                shutil.copy(arquivo, diretorioDestinoSat)
 
 
-def separaArquivosNfePorDataDeEmissao(mesPassadoFormatado):
-    print('================= arquivos nfe ========================')
+def separaArquivosNfePorDataDeEmissao(ano, mes):
+    nomeDoMes = retornaNomeDoMes(mes)
+    diretorioDestinoNfe = 'C:/arquivos fiscais/' + str(ano) + '/' + nomeDoMes + '/NFE'
+    criaDiretorioDeDestino(diretorioDestinoNfe)
+    mesFormatado = formataMes(mes)
+    print('==================== arquivos nfe ====================')
     arquivos = filtraArquivosXml(diretorioNfe)
     for arquivo in arquivos:
-        if (arquivo[::-1][0:7] == 'lmx.efn'):
+        if (arquivo[::-1][0:7] == 'lmx.efn') or :
             xmldoc = minidom.parse(arquivo)
             dataDeEmissao = xmldoc.getElementsByTagName(tagNfe)[0]
-
-            '''
-            print(arquivo)
-            print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
-            print('{} == {} = {}'.format(str(dataDeEmissao.firstChild.data), nowInStr, str(dataDeEmissao.firstChild.data) == nowInStr))
-            nomeDoMes = retornaNomeDoMes(calculaMesPassado())
-            print('mes passado: ' + nomeDoMes)
-            '''
-            if (str(dataDeEmissao.firstChild.data)[5:7].__eq__(mesPassadoFormatado)):
-                print('narf')
+            if (str(dataDeEmissao.firstChild.data)[5:7].__eq__(mesFormatado)):
+                print('troll')
             else:
                 print(str(dataDeEmissao.firstChild.data))
 
-def criaDiretoriosDeDestino(ano, mes):
-    diretorioSat = 'C:/arquivos fiscais/' + ano + '/' + mes + '/SAT'
-    diretorioNfe = 'C:/arquivos fiscais/' + ano + '/' + mes + '/NFE'
 
-    if not (os.path.exists(diretorioSat)):
-        os.makedirs(diretorioSat)
-
-    if not (os.path.exists(diretorioNfe)):
-        os.makedirs(diretorioNfe)
+def criaDiretorioDeDestino(caminho):
+    if not (os.path.exists(caminho)):
+        os.makedirs(caminho)
 
 
 def retornaNomeDoMes(mes):
@@ -122,7 +110,6 @@ def retornaNomeDoMes(mes):
     return switcher.get(mes, 'mes invalido')
 
 
-separaArquivosNfePorDataDeEmissao(formataMes(calculaMesPassado()))
-criaDiretoriosDeDestino(str(calculaAno()), retornaNomeDoMes(calculaMesPassado()))
-separaArquivosSatPorDataDeEmissao(formataMes(calculaMesPassado()))
+separaArquivosNfePorDataDeEmissao(calculaAno(), calculaMesPassado())
+separaArquivosSatPorDataDeEmissao(calculaAno(), calculaMesPassado())
 
