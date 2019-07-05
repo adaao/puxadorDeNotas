@@ -3,15 +3,16 @@ Autor: Adaão
 Empresa: World Computer
 data: 05/07/2019
 '''
+
 import os.path
 import shutil
 from datetime import datetime
 from xml.dom import minidom
 
 print('Salvando arquivos fiscais...')
-diretorioSat = 'C:/Program Files (x86)/Nox Automação/Fenix/SAT/XML'
-diretorioNfe = 'C:/Program Files (x86)/Nox Automação/Fenix/NFe/XML'
-diretorioBox = 'C:/Users/Gift/Box Sync/contabilidade/'
+diretorioSat = 'C:/Program Files (x86)/Nox Automação/Fenix Combo/SAT/XML'
+diretorioNfe = 'C:/Program Files (x86)/Nox Automação/Fenix Combo/NFe/XML'
+diretorioBox = os.path.expanduser('~/') + 'Box Sync/contabilidade/'
 tagSat = 'dEmi'
 tagNfe = 'dhEmi'
 
@@ -67,7 +68,7 @@ def separaArquivosSatPorDataDeEmissao(ano, mes):
     mesFormatado = formataMes(mes)
     arquivos = filtraArquivosXml(diretorioSat)
     for arquivo in arquivos:
-        if (arquivo[51:53] == 'AD'):
+        if (arquivo[57:59] == 'AD'):
             xmldoc = minidom.parse(arquivo)
             dataDeEmissao = xmldoc.getElementsByTagName(tagSat)[0]
             if (str(dataDeEmissao.firstChild.data)[4:6].__eq__(mesFormatado)):
@@ -85,7 +86,6 @@ def separaArquivosNfePorDataDeEmissao(ano, mes):
     arquivos = filtraArquivosXml(diretorioNfe)
     for arquivo in arquivos:
         if (arquivo[::-1][0:7] == 'lmx.efn'):
-            ''' or (arquivo[::-1][0:7] == 'lmx.uni'): '''
             xmldoc = minidom.parse(arquivo)
             dataDeEmissao = xmldoc.getElementsByTagName('dhEmi')[0]
             if (str(dataDeEmissao.firstChild.data)[5:7].__eq__(mesFormatado)):
@@ -103,6 +103,13 @@ def separaArquivosNfePorDataDeEmissao(ano, mes):
                 shutil.copy(arquivo, diretorioDestinoNfe)
             else:
                 print('troll')
+        if (arquivo[::-1][0:7] == 'lmx.uni'):
+            xmldoc = minidom.parse(arquivo)
+            dataDeEmissao = xmldoc.getElementsByTagName('dhRcbto')[0]
+            if (str(dataDeEmissao.firstChild.data)[5:7].__eq__(mesFormatado)):
+                print(arquivo)
+                print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
+                shutil.copy(arquivo, diretorioDestinoNfe)
 
 def criaDiretorioDeDestino(caminho):
     if not (os.path.exists(caminho)):

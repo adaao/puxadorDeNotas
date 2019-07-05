@@ -79,7 +79,6 @@ def separaArquivosNfePorDataDeEmissao(ano, mes):
     arquivos = filtraArquivosXml(diretorioNfe)
     for arquivo in arquivos:
         if (arquivo[::-1][0:7] == 'lmx.efn'):
-            ''' or (arquivo[::-1][0:7] == 'lmx.uni'): '''
             xmldoc = minidom.parse(arquivo)
             dataDeEmissao = xmldoc.getElementsByTagName('dhEmi')[0]
             if (str(dataDeEmissao.firstChild.data)[5:7].__eq__(mesFormatado)):
@@ -97,6 +96,14 @@ def separaArquivosNfePorDataDeEmissao(ano, mes):
                 shutil.copy(arquivo, diretorioDestinoNfe)
             else:
                 print('troll')
+        if (arquivo[::-1][0:7] == 'lmx.uni'):
+            xmldoc = minidom.parse(arquivo)
+            dataDeEmissao = xmldoc.getElementsByTagName('dhRcbto')[0]
+            if (str(dataDeEmissao.firstChild.data)[5:7].__eq__(mesFormatado)):
+                print(arquivo)
+                print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
+                shutil.copy(arquivo, diretorioDestinoNfe)
+
 
 def criaDiretorioDeDestino(caminho):
     if not (os.path.exists(caminho)):
