@@ -1,12 +1,17 @@
+'''
+Autor: Adaão
+Empresa: World Computer
+data: 05/07/2019
+'''
 import os.path
 import shutil
 from datetime import datetime
 from xml.dom import minidom
 
 print('Salvando arquivos fiscais...')
-diretorioSat = 'C:/Program Files (x86)/Nox Automação/Fenix Combo/SAT/XML'
-diretorioNfe = 'C:/Program Files (x86)/Nox Automação/Fenix Combo/NFe/XML'
-diretorioBox = 'C:/Users/universo/Box Sync/contabilidade/'
+diretorioSat = 'C:/Program Files (x86)/Nox Automação/Fenix/SAT/XML'
+diretorioNfe = 'C:/Program Files (x86)/Nox Automação/Fenix/NFe/XML'
+diretorioBox = 'C:/Users/Gift/Box Sync/contabilidade/'
 tagSat = 'dEmi'
 tagNfe = 'dhEmi'
 
@@ -62,7 +67,7 @@ def separaArquivosSatPorDataDeEmissao(ano, mes):
     mesFormatado = formataMes(mes)
     arquivos = filtraArquivosXml(diretorioSat)
     for arquivo in arquivos:
-        if (arquivo[57:59] == 'AD'):
+        if (arquivo[51:53] == 'AD'):
             xmldoc = minidom.parse(arquivo)
             dataDeEmissao = xmldoc.getElementsByTagName(tagSat)[0]
             if (str(dataDeEmissao.firstChild.data)[4:6].__eq__(mesFormatado)):
