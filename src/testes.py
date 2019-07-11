@@ -1,7 +1,7 @@
 '''
 Autor: Adaão
 Empresa: World Computer
-data: 05/07/2019
+data: 11/07/2019
 '''
 
 import os.path
@@ -149,6 +149,23 @@ def retornaNomeDoMes(mes):
     return switcher.get(mes, 'mes invalido')
 
 
+def lerAnoEMesDosArquivos():
+    print('apenas lendo as datas...')
+    arquivos = filtraArquivosXml(diretorioNfe)
+    if len(arquivos) > 0:
+        mesFormatado = formataMes(calculaMesPassado())
+        ano = calculaAno()
+        for arquivo in arquivos:
+            if (arquivo[::-1][0:7] == 'lmx.efn'):
+                xmldoc = minidom.parse(arquivo)
+                dataDeEmissao = xmldoc.getElementsByTagName('dhEmi')[0]
+                if str(dataDeEmissao.firstChild.data)[0:4].__eq__(str(ano)) and str(dataDeEmissao.firstChild.data)[5:7].__eq__(mesFormatado):
+                    print(arquivo)
+                    print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
+                    print(str(dataDeEmissao.firstChild.data)[0:4])
+    print('fim da leitura das datas')
+
+
+lerAnoEMesDosArquivos()
 separaArquivosNfePorDataDeEmissao(calculaAno(), calculaMesPassado())
 separaArquivosSatPorDataDeEmissao(calculaAno(), calculaMesPassado())
-
