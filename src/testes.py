@@ -10,8 +10,8 @@ from datetime import datetime
 from xml.dom import minidom
 
 print('Salvando arquivos fiscais...')
-diretorioSat = 'C:/Program Files (x86)/Nox Automação/Fenix/SAT/XML/TESTE'
-diretorioNfe = 'C:/Program Files (x86)/Nox Automação/Fenix/NFe/XML/TESTE'
+diretorioSat = 'C:/Program Files (x86)/Nox Automação/Fenix/SAT/XML'
+diretorioNfe = 'C:/Program Files (x86)/Nox Automação/Fenix/NFe/XML'
 diretorioBox = ''
 tagSat = 'dEmi'
 tagNfe = 'dhEmi'
@@ -65,6 +65,11 @@ def filtraArquivosXml(diretorio):
         input()
 
 
+def criaDiretorio(diretorio):
+    if not os.path.exists(diretorio):
+        os.makedirs(diretorio)
+
+
 def geraArquivoZipado(diretorioDestino, diretorioOrigem):
     shutil.make_archive(diretorioDestino, 'zip', diretorioOrigem)
 
@@ -74,14 +79,10 @@ def separaArquivosSatPorDataDeEmissao(ano, mes):
         nomeDoMes = retornaNomeDoMes(mes)
         diretorioDeDestinoSat = diretorioSat + '/' + nomeDoMes
         diretorioBoxDeDestinoSat = diretorioBox + str(ano) + '/' + nomeDoMes + '/' + nomeDoMes + ' - SAT/'
-        criaDiretorioDeDestino(diretorioDeDestinoSat)
+        criaDiretorio(diretorioDeDestinoSat)
         mesFormatado = formataMes(mes)
-
-        if not os.path.exists(diretorioBox + str(ano) + '/' + nomeDoMes):
-            os.makedirs(diretorioBox + str(ano) + '/' + nomeDoMes)
+        criaDiretorio(diretorioBox + str(ano) + '/' + nomeDoMes)
         print('==================== arquivos sat ====================')
-        if not os.path.exists(diretorioBox + str(ano) + '/' + nomeDoMes):
-            os.makedirs(diretorioBox + str(ano) + '/' + nomeDoMes)
         for arquivo in arquivos:
             if (arquivo[51:53] == 'AD'):
                 xmldoc = minidom.parse(arquivo)
@@ -94,44 +95,40 @@ def separaArquivosSatPorDataDeEmissao(ano, mes):
 
 
 def separaArquivosNfePorDataDeEmissao(ano, mes):
-    nomeDoMes = retornaNomeDoMes(mes)
-    diretorioDeDestinoNfe = diretorioNfe + '/' + nomeDoMes
-    diretorioDeDestinoBox = diretorioBox + str(ano) + '/' + nomeDoMes + '/' + nomeDoMes + ' - NFE'
-    criaDiretorioDeDestino(diretorioDeDestinoNfe)
-    mesFormatado = formataMes(mes)
     arquivos = filtraArquivosXml(diretorioNfe)
-    if not os.path.exists(diretorioBox + str(ano) + '/' + nomeDoMes):
-        os.makedirs(diretorioBox + str(ano) + '/' + nomeDoMes)
-    print('==================== arquivos nfe ====================')
-    for arquivo in arquivos:
-        if (arquivo[::-1][0:7] == 'lmx.efn'):
-            xmldoc = minidom.parse(arquivo)
-            dataDeEmissao = xmldoc.getElementsByTagName('dhEmi')[0]
-            if str(dataDeEmissao.firstChild.data)[0:4].__eq__(str(ano)) and (str(dataDeEmissao.firstChild.data)[5:7].__eq__(mesFormatado)):
-                print(arquivo)
-                print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
-                shutil.copy(arquivo, diretorioDeDestinoNfe)
-        if (arquivo[::-1][0:7] == 'lmx.ecc') or (arquivo[::-1][0:7] == 'lmx.eve'):
-            xmldoc = minidom.parse(arquivo)
-            dataDeEmissao = xmldoc.getElementsByTagName('dhEvento')[0]
-            if str(dataDeEmissao.firstChild.data)[0:4].__eq__(str(ano)) and (str(dataDeEmissao.firstChild.data)[5:7].__eq__(mesFormatado)):
-                print(arquivo)
-                print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
-                shutil.copy(arquivo, diretorioDeDestinoNfe)
-        if (arquivo[::-1][0:7] == 'lmx.uni'):
-            xmldoc = minidom.parse(arquivo)
-            if len(xmldoc.getElementsByTagName('dhRcbto')) == 1:
-                dataDeEmissao = xmldoc.getElementsByTagName('dhRcbto')[0]
+    if len(arquivos) > 0:
+        nomeDoMes = retornaNomeDoMes(mes)
+        diretorioDeDestinoNfe = diretorioNfe + '/' + nomeDoMes
+        diretorioDeDestinoBox = diretorioBox + str(ano) + '/' + nomeDoMes + '/' + nomeDoMes + ' - NFE'
+        criaDiretorio(diretorioDeDestinoNfe)
+        mesFormatado = formataMes(mes)
+
+        criaDiretorio(diretorioBox + str(ano) + '/' + nomeDoMes)
+        print('==================== arquivos nfe ====================')
+        for arquivo in arquivos:
+            if (arquivo[::-1][0:7] == 'lmx.efn'):
+                xmldoc = minidom.parse(arquivo)
+                dataDeEmissao = xmldoc.getElementsByTagName('dhEmi')[0]
                 if str(dataDeEmissao.firstChild.data)[0:4].__eq__(str(ano)) and (str(dataDeEmissao.firstChild.data)[5:7].__eq__(mesFormatado)):
                     print(arquivo)
                     print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
                     shutil.copy(arquivo, diretorioDeDestinoNfe)
-    geraArquivoZipado(diretorioDeDestinoBox, diretorioDeDestinoNfe)
-
-
-def criaDiretorioDeDestino(caminho):
-    if not (os.path.exists(caminho)):
-        os.makedirs(caminho)
+            if (arquivo[::-1][0:7] == 'lmx.ecc') or (arquivo[::-1][0:7] == 'lmx.eve'):
+                xmldoc = minidom.parse(arquivo)
+                dataDeEmissao = xmldoc.getElementsByTagName('dhEvento')[0]
+                if str(dataDeEmissao.firstChild.data)[0:4].__eq__(str(ano)) and (str(dataDeEmissao.firstChild.data)[5:7].__eq__(mesFormatado)):
+                    print(arquivo)
+                    print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
+                    shutil.copy(arquivo, diretorioDeDestinoNfe)
+            if (arquivo[::-1][0:7] == 'lmx.uni'):
+                xmldoc = minidom.parse(arquivo)
+                if len(xmldoc.getElementsByTagName('dhRcbto')) == 1:
+                    dataDeEmissao = xmldoc.getElementsByTagName('dhRcbto')[0]
+                    if str(dataDeEmissao.firstChild.data)[0:4].__eq__(str(ano)) and (str(dataDeEmissao.firstChild.data)[5:7].__eq__(mesFormatado)):
+                        print(arquivo)
+                        print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
+                        shutil.copy(arquivo, diretorioDeDestinoNfe)
+        geraArquivoZipado(diretorioDeDestinoBox, diretorioDeDestinoNfe)
 
 
 def retornaNomeDoMes(mes):
@@ -153,17 +150,20 @@ def retornaNomeDoMes(mes):
 
 
 def lerAnoEMesDosArquivos():
+    print('apenas lendo as datas...')
     arquivos = filtraArquivosXml(diretorioNfe)
-    mesFormatado = formataMes(calculaMesPassado())
-    ano = calculaAno()
-    for arquivo in arquivos:
-        if (arquivo[::-1][0:7] == 'lmx.efn'):
-            xmldoc = minidom.parse(arquivo)
-            dataDeEmissao = xmldoc.getElementsByTagName('dhEmi')[0]
-            if str(dataDeEmissao.firstChild.data)[0:4].__eq__(str(ano)) and str(dataDeEmissao.firstChild.data)[5:7].__eq__(mesFormatado):
-                print(arquivo)
-                print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
-                print(str(dataDeEmissao.firstChild.data)[0:4])
+    if len(arquivos) > 0:
+        mesFormatado = formataMes(calculaMesPassado())
+        ano = calculaAno()
+        for arquivo in arquivos:
+            if (arquivo[::-1][0:7] == 'lmx.efn'):
+                xmldoc = minidom.parse(arquivo)
+                dataDeEmissao = xmldoc.getElementsByTagName('dhEmi')[0]
+                if str(dataDeEmissao.firstChild.data)[0:4].__eq__(str(ano)) and str(dataDeEmissao.firstChild.data)[5:7].__eq__(mesFormatado):
+                    print(arquivo)
+                    print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
+                    print(str(dataDeEmissao.firstChild.data)[0:4])
+    print('fim da leitura das datas')
 
 
 lerAnoEMesDosArquivos()
