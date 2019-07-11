@@ -10,8 +10,12 @@ from datetime import datetime
 from xml.dom import minidom
 
 print('Salvando arquivos fiscais...')
+diretorioNox = ''
+'''
 diretorioSat = 'C:/Program Files (x86)/Nox Automação/Fenix/SAT/XML'
 diretorioNfe = 'C:/Program Files (x86)/Nox Automação/Fenix/NFe/XML'
+'''
+
 diretorioBox = ''
 tagSat = 'dEmi'
 tagNfe = 'dhEmi'
@@ -20,6 +24,18 @@ if os.path.exists(os.path.expanduser('~/') + '/Box Sync'):
     diretorioBox = os.path.expanduser('~/') + '/Box Sync/contabilidade/'
 else:
     diretorioBox = os.path.expanduser('~/') + '/Box/contabilidade/'
+
+
+if os.path.exists('C:/Program Files (x86)/Nox Automação/Fenix'):
+    diretorioNox = 'C:/Program Files (x86)/Nox Automação/Fenix'
+else:
+    if os.path.exists('C:/Program Files (x86)/Nox Automação/Fenix Combo'):
+        diretorioNox = 'C:/Program Files (x86)/Nox Automação/Fenix Combo'
+    else:
+        print('O diretorio de instalação do sistema Fenix não foi encontrado')
+
+diretorioSat = diretorioNox + '/SAT/XML'
+diretorioNfe = diretorioNox + '/NFe/XML'
 
 now = datetime.now()
 
