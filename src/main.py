@@ -1,22 +1,27 @@
+"""
+Autor: Adaão
+Empresa: World Computer
+data: 11/07/2019
+"""
+
 import os.path
 import shutil
 from datetime import datetime
 from xml.dom import minidom
 
-print('Salvando arquivos fiscais...')
-diretorioSat = 'C:/Program Files (x86)/Nox Automação/Fenix/SAT/XML'
-diretorioNfe = 'C:/Program Files (x86)/Nox Automação/Fenix/NFe/XML'
-tagSat = 'dEmi'
-tagNfe = 'dhEmi'
+def defineDiretorioBox():
+    if os.path.exists(os.path.expanduser('~/') + '/Box Sync'):
+        return os.path.expanduser('~/') + '/Box Sync/contabilidade/'
+    else:
+        return os.path.expanduser('~/') + '/Box/contabilidade/'
 
 
-now = datetime.now()
-
-
-if now.month < 10:
-    nowInStr = str(now.year) + '0' + str(now.month) + str(now.day)
-else:
-    nowInStr = str(now.year) + str(now.month) + str(now.day)
+def defineDiretorioNox():
+    if os.path.exists('C:/Program Files (x86)/Nox Automação/Fenix'):
+        return 'C:/Program Files (x86)/Nox Automação/Fenix'
+    else:
+        if os.path.exists('C:/Program Files (x86)/Nox Automação/Fenix Combo'):
+            return 'C:/Program Files (x86)/Nox Automação/Fenix Combo'
 
 
 def formataMes(mes):
@@ -27,7 +32,7 @@ def formataMes(mes):
     return mesFormatado
 
 
-def calculaMesPassado():
+def calculaMesPassado(now):
     if (now.month == 1):
         mesPassado = 12
     else:
@@ -35,7 +40,7 @@ def calculaMesPassado():
     return mesPassado
 
 
-def calculaAno():
+def calculaAno(now):
     if (now.month == 1):
         ano = now.year - 1
     else:
@@ -53,61 +58,69 @@ def filtraArquivosXml(diretorio):
         input()
 
 
-def separaArquivosSatPorDataDeEmissao(ano, mes):
-    nomeDoMes = retornaNomeDoMes(mes)
-    print('==================== arquivos sat ====================')
-    diretorioDestinoSat = 'C:/arquivos fiscais/' + str(ano) + '/' + nomeDoMes + '/SAT'
-    criaDiretorioDeDestino(diretorioDestinoSat)
-    mesFormatado = formataMes(mes)
+def criaDiretorio(diretorio):
+    if not os.path.exists(diretorio):
+        os.makedirs(diretorio)
+
+
+def geraArquivoZipado(diretorioDestino, diretorioOrigem):
+    shutil.make_archive(diretorioDestino, 'zip', diretorioOrigem)
+
+def separaArquivosSatPorDataDeEmissao(ano, mes, diretorioSat, diretorioBox):
     arquivos = filtraArquivosXml(diretorioSat)
-    for arquivo in arquivos:
-        if (arquivo[51:53] == 'AD'):
-            xmldoc = minidom.parse(arquivo)
-            dataDeEmissao = xmldoc.getElementsByTagName(tagSat)[0]
-            if (str(dataDeEmissao.firstChild.data)[4:6].__eq__(mesFormatado)):
-                print(arquivo)
-                print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
-                shutil.copy(arquivo, diretorioDestinoSat)
+    if len(arquivos) > 0:
+        nomeDoMes = retornaNomeDoMes(mes)
+        diretorioDeDestinoSat = diretorioSat + '/' + nomeDoMes
+        diretorioBoxDeDestinoSat = diretorioBox + str(ano) + '/' + nomeDoMes + '/' + nomeDoMes + ' - SAT/'
+        criaDiretorio(diretorioDeDestinoSat)
+        mesFormatado = formataMes(mes)
+        criaDiretorio(diretorioBox + str(ano) + '/' + nomeDoMes)
+        print('==================== arquivos sat ====================')
+        for arquivo in arquivos:
+            if (arquivo[51:53] == 'AD') or (arquivo[57:59] == 'AD'):
+                xmldoc = minidom.parse(arquivo)
+                dataDeEmissao = xmldoc.getElementsByTagName(tagSat)[0]
+                if str(dataDeEmissao.firstChild.data)[0:4].__eq__(str(ano)) and (str(dataDeEmissao.firstChild.data)[4:6].__eq__(mesFormatado)):
+                    print(arquivo)
+                    print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
+                    shutil.copy(arquivo, diretorioDeDestinoSat)
+        geraArquivoZipado(diretorioBoxDeDestinoSat, diretorioDeDestinoSat)
 
 
-def separaArquivosNfePorDataDeEmissao(ano, mes):
-    nomeDoMes = retornaNomeDoMes(mes)
-    diretorioDestinoNfe = 'C:/arquivos fiscais/' + str(ano) + '/' + nomeDoMes + '/NFE'
-    criaDiretorioDeDestino(diretorioDestinoNfe)
-    mesFormatado = formataMes(mes)
-    print('==================== arquivos nfe ====================')
+def separaArquivosNfePorDataDeEmissao(ano, mes, diretorioNfe, diretorioBox):
     arquivos = filtraArquivosXml(diretorioNfe)
-    for arquivo in arquivos:
-        if (arquivo[::-1][0:7] == 'lmx.efn'):
-            xmldoc = minidom.parse(arquivo)
-            dataDeEmissao = xmldoc.getElementsByTagName('dhEmi')[0]
-            if (str(dataDeEmissao.firstChild.data)[5:7].__eq__(mesFormatado)):
-                print(arquivo)
-                print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
-                shutil.copy(arquivo, diretorioDestinoNfe)
-            else:
-                print('troll')
-        if (arquivo[::-1][0:7] == 'lmx.ecc') or (arquivo[::-1][0:7] == 'lmx.eve'):
-            xmldoc = minidom.parse(arquivo)
-            dataDeEmissao = xmldoc.getElementsByTagName('dhEvento')[0]
-            if (str(dataDeEmissao.firstChild.data)[5:7].__eq__(mesFormatado)):
-                print(arquivo)
-                print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
-                shutil.copy(arquivo, diretorioDestinoNfe)
-            else:
-                print('troll')
-        if (arquivo[::-1][0:7] == 'lmx.uni'):
-            xmldoc = minidom.parse(arquivo)
-            dataDeEmissao = xmldoc.getElementsByTagName('dhRcbto')[0]
-            if (str(dataDeEmissao.firstChild.data)[5:7].__eq__(mesFormatado)):
-                print(arquivo)
-                print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
-                shutil.copy(arquivo, diretorioDestinoNfe)
-
-
-def criaDiretorioDeDestino(caminho):
-    if not (os.path.exists(caminho)):
-        os.makedirs(caminho)
+    if len(arquivos) > 0:
+        nomeDoMes = retornaNomeDoMes(mes)
+        diretorioDeDestinoNfe = diretorioNfe + '/' + nomeDoMes
+        diretorioDeDestinoBox = diretorioBox + str(ano) + '/' + nomeDoMes + '/' + nomeDoMes + ' - NFE'
+        criaDiretorio(diretorioDeDestinoNfe)
+        mesFormatado = formataMes(mes)
+        criaDiretorio(diretorioBox + str(ano) + '/' + nomeDoMes)
+        print('==================== arquivos nfe ====================')
+        for arquivo in arquivos:
+            if (arquivo[::-1][0:7] == 'lmx.efn'):
+                xmldoc = minidom.parse(arquivo)
+                dataDeEmissao = xmldoc.getElementsByTagName('dhEmi')[0]
+                if str(dataDeEmissao.firstChild.data)[0:4].__eq__(str(ano)) and (str(dataDeEmissao.firstChild.data)[5:7].__eq__(mesFormatado)):
+                    print(arquivo)
+                    print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
+                    shutil.copy(arquivo, diretorioDeDestinoNfe)
+            if (arquivo[::-1][0:7] == 'lmx.ecc') or (arquivo[::-1][0:7] == 'lmx.eve'):
+                xmldoc = minidom.parse(arquivo)
+                dataDeEmissao = xmldoc.getElementsByTagName('dhEvento')[0]
+                if str(dataDeEmissao.firstChild.data)[0:4].__eq__(str(ano)) and (str(dataDeEmissao.firstChild.data)[5:7].__eq__(mesFormatado)):
+                    print(arquivo)
+                    print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
+                    shutil.copy(arquivo, diretorioDeDestinoNfe)
+            if (arquivo[::-1][0:7] == 'lmx.uni'):
+                xmldoc = minidom.parse(arquivo)
+                if len(xmldoc.getElementsByTagName('dhRcbto')) == 1:
+                    dataDeEmissao = xmldoc.getElementsByTagName('dhRcbto')[0]
+                    if str(dataDeEmissao.firstChild.data)[0:4].__eq__(str(ano)) and (str(dataDeEmissao.firstChild.data)[5:7].__eq__(mesFormatado)):
+                        print(arquivo)
+                        print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
+                        shutil.copy(arquivo, diretorioDeDestinoNfe)
+        geraArquivoZipado(diretorioDeDestinoBox, diretorioDeDestinoNfe)
 
 
 def retornaNomeDoMes(mes):
@@ -128,6 +141,15 @@ def retornaNomeDoMes(mes):
     return switcher.get(mes, 'mes invalido')
 
 
-separaArquivosNfePorDataDeEmissao(calculaAno(), calculaMesPassado())
-separaArquivosSatPorDataDeEmissao(calculaAno(), calculaMesPassado())
+print('Salvando arquivos fiscais...')
+tagSat = 'dEmi'
+tagNfe = 'dhEmi'
 
+def main():
+    diretorioNox = defineDiretorioNox()
+    diretorioSat = diretorioNox + '/SAT/XML'
+    diretorioNfe = diretorioNox + '/NFe/XML'
+    diretorioBox = defineDiretorioBox()
+    now = datetime.now()
+    separaArquivosNfePorDataDeEmissao(calculaAno(), calculaMesPassado(), diretorioNfe, diretorioBox, now)
+    separaArquivosSatPorDataDeEmissao(calculaAno(), calculaMesPassado(), diretorioSat, diretorioBox, now)

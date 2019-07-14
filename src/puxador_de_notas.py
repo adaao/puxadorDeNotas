@@ -9,6 +9,7 @@ import shutil
 from datetime import datetime
 from xml.dom import minidom
 
+
 def defineDiretorioBox():
     if os.path.exists(os.path.expanduser('~/') + '/Box Sync'):
         return os.path.expanduser('~/') + '/Box Sync/contabilidade/'
