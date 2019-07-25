@@ -1,7 +1,7 @@
 """
 Autor: Adaão
 Empresa: World Computer
-data: 14/07/2019
+data: 25/07/2019
 """
 
 import os.path
@@ -56,7 +56,8 @@ def filtraArquivosXml(diretorio):
         return arquivosXml
     else:
         print('Os diretorios ou os arquivos xml não foram encontrados...')
-        input()
+        input('Pressione enter para sair')
+        exit()
 
 
 def criaDiretorio(diretorio):
@@ -146,7 +147,7 @@ def retornaNomeDoMes(mes):
 
 def main():
     print('Salvando arquivos fiscais...')
-    diretorioNox = defineDiretorioNox()
+    diretorioNox = str(defineDiretorioNox())
     diretorioSat = diretorioNox + '/SAT/XML'
     diretorioNfe = diretorioNox + '/NFe/XML'
     diretorioBox = defineDiretorioBox()

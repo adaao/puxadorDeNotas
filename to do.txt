@@ -1,6 +1,0 @@
-﻿zipar os arquivos em uma pasta com o nome do mes e o tipo de arquivos, se é sat ou nfe; - ok
-
-filtrar os arquivos pelo ano também; - ok
-
-ler o nome dos arquivos sat de traz para frente e pegar o inicio do nome;
-
