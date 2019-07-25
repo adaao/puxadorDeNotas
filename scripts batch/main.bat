@@ -1,0 +1,1 @@
+python "C:\puxador de notas\puxador_de_notas.py"
