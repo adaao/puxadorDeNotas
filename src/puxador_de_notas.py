@@ -88,7 +88,8 @@ def separaArquivosSatPorDataDeEmissao(ano, mes, diretorioSat, diretorioBox):
                     print(arquivo)
                     print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
                     shutil.copy(arquivo, diretorioDeDestinoSat)
-        geraArquivoZipado(diretorioBoxDeDestinoSat, diretorioDeDestinoSat)
+        if len(filtraArquivosXml(diretorioDeDestinoSat)) > 0:
+            geraArquivoZipado(diretorioBoxDeDestinoSat, diretorioDeDestinoSat)
 
 
 def separaArquivosNfePorDataDeEmissao(ano, mes, diretorioNfe, diretorioBox):
@@ -124,7 +125,8 @@ def separaArquivosNfePorDataDeEmissao(ano, mes, diretorioNfe, diretorioBox):
                         print(arquivo)
                         print('data de emissao: ' + str(dataDeEmissao.firstChild.data))
                         shutil.copy(arquivo, diretorioDeDestinoNfe)
-        geraArquivoZipado(diretorioDeDestinoBox, diretorioDeDestinoNfe)
+        if len(filtraArquivosXml(diretorioDeDestinoNfe)) > 0:
+            geraArquivoZipado(diretorioDeDestinoBox, diretorioDeDestinoNfe)
 
 
 def retornaNomeDoMes(mes):
